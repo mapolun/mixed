@@ -1,5 +1,13 @@
+
+--privileged=true 使容器具有root权限  
+--restart=always 开机自动启动 
+-d 以守护线程的方式运行（后台运行）
+-i 以交互模式运行容器
+-t 为容器重新分配一个伪输入终端 
+--appendonly yes 启动后数据持久化
+
 //启动php8
-docker run -d \
+docker run -itd \
 --name php8 \
 -v /mapo/www:/www \
 --privileged=true \
@@ -7,34 +15,67 @@ docker run -d \
 mapo2017/php8.0.2-swoole-redis
 
 //启动nginx(关联php8)
-docker run -d \
+docker run -itd \
 --name nginx \
 -p 80:80 \
--v /mapo/www:/usr/share/nginx/html:ro \
--v /mapo/nginx/conf/conf.d:/etc/nginx/conf.d:ro \
---privileged=true \
+-v /mapo/www:/usr/share/nginx/html:ro \ //挂载网站根目录->nginx配置的根目录
+-v /mapo/nginx/conf/conf.d:/etc/nginx/conf.d:ro \ //挂载nginx配置文件
+--privileged=true \ 
 --restart=always \
 --link php8:php \
 mapo2017/nginx
 
 
 //启动meilisearch
-docker run -d \
+docker run -itd \
 --name meilisearch \
 -p 7700:7700 \
--v $(pwd)/data.ms:/data.ms \
+-v /mapo/meilisearch/data.ms:/data.ms \ //挂载meilisearch数据中心
 -e MEILI_MASTER_KEY="123456" \
 --privileged=true \
 --restart=always \
 mapo2017/meilisearch
 
 //启动mongo
-docker run -d \
+docker run -itd \
 --name mongo \
 -p 27017:27017 \
--v /mapo/mongo/datadb:/data/db \
+-v /mapo/mongo/datadb:/data/db \ //挂载mongo数据库文件
 -e MONGO_INITDB_ROOT_USERNAME=admin \
 -e MONGO_INITDB_ROOT_PASSWORD=123456 \
 --privileged=true \
 --restart always \
 mapo2017/mongo
+
+//启动mysql
+docker run -itd \
+--name mysql \
+-p 3306:3306 \
+-v /mapo/mysql/log:/var/log/mysql \ //日志文件夹 挂载到 主机的相应位置
+-v /mapo/mysql/data:/var/lib/mysql \ //数据文件夹 挂载到 主机的相应位置
+-v /mapo/mysql/conf:/etc/mysql/conf.d \ //自定义配置文件夹 挂载到主机的相应位置
+-e MYSQL_ROOT_PASSWORD=123456 \
+--privileged=true \
+--restart always \
+mysql:latest
+
+//启动redis
+docker run -itd \
+--name redis \
+-p 6607:6607 \
+-v /mapo/redis/redis.conf:/etc/redis/redis.conf \ //宿主机配置好的redis.conf挂载到容器内的指定位置
+-v /mapo/redis/data:/data \  //把redis持久化的数据挂载到宿主机内，做数据备份
+--privileged=true \
+--restart always \
+redis-server /etc/redis/redis.conf --appendonly yes redis
+
+docker run -itd --name mongo -p 27017:27017 -v /mapo/mongo/datadb:/data/db -e MONGO_INITDB_ROOT_USERNAME=admin -e MONGO_INITDB_ROOT_PASSWORD=123456 --privileged=true --restart always mongo
+
+docker run -itd \
+--name redis \
+-p 6607:6607 \
+-v /mapo/redis/conf/redis.conf:/etc/redis/redis.conf \
+-v /mapo/redis/data:/data \
+--privileged=true \
+--restart always \
+mapo2017/redis redis-server /etc/redis/redis.conf --appendonly yes
