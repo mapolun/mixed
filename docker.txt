@@ -1,3 +1,6 @@
+
+docker地址：https://hub.docker.com/u/mapo2017
+
 --privileged=true 使容器具有root权限  
 --restart=always 开机自动启动 
 -d 以守护线程的方式运行（后台运行）
