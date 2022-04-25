@@ -1,0 +1,11 @@
+//启动php8
+docker run --name php8 -v /mapo/www:/www -d --restart=always mapo2017/php8.0.2-swoole-redis
+
+//启动nginx-关联php8
+docker run --name nginx -p 80:80 -d --restart=always -v /mapo/www:/usr/share/nginx/html:ro -v /mapo/nginx/conf/conf.d:/etc/nginx/conf.d:ro --link php8:php nginx
+
+//启动meilisearch
+docker run --name meilisearch -d --restart=always -p 7700:7700 -v $(pwd)/data.ms:/data.ms --master-key="123456789" -e "" getmeili/meilisearch:latest 
+
+//启动mongodb
+docker run --name mongo -d --restart=always -p 27017:27017 mongo:latest
