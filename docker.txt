@@ -66,15 +66,4 @@ docker run -itd \
 -v /mapo/redis/data:/data \  //把redis持久化的数据挂载到宿主机内，做数据备份
 --privileged=true \
 --restart always \
-redis-server /etc/redis/redis.conf --appendonly yes redis
-
-docker run -itd --name mongo -p 27017:27017 -v /mapo/mongo/datadb:/data/db -e MONGO_INITDB_ROOT_USERNAME=admin -e MONGO_INITDB_ROOT_PASSWORD=123456 --privileged=true --restart always mongo
-
-docker run -itd \
---name redis \
--p 6607:6607 \
--v /mapo/redis/conf/redis.conf:/etc/redis/redis.conf \
--v /mapo/redis/data:/data \
---privileged=true \
---restart always \
 mapo2017/redis redis-server /etc/redis/redis.conf --appendonly yes
