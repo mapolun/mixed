@@ -20,7 +20,7 @@ mapo2017/php8.0.2-swoole-redis
 docker run -itd \
 --name nginx \
 -p 80:80 \
--v /mapo/www:/usr/share/nginx/html:ro \ //挂载网站根目录->nginx配置的根目录
+-v /mapo/www:/www:ro \ //挂载网站根目录->nginx配置的根目录
 -v /mapo/nginx/conf/conf.d:/etc/nginx/conf.d:ro \ //挂载nginx配置文件
 --privileged=true \ 
 --restart=always \
